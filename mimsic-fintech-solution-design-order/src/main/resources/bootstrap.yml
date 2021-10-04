@@ -1,0 +1,43 @@
+---
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+  instance:
+    leaseRenewalIntervalInSeconds: 30
+    metadataMap:
+      instanceId: ${vcap.application.instance_id:${spring.application.name}:${spring.application.instance_id:${server.port}}}
+    preferIpAddress: true
+
+management:
+  endpoints:
+    restart:
+      enabled: true
+    web:
+      exposure:
+        include: "*"
+  security:
+    enabled: false
+
+server:
+  port: 0
+
+spring:
+  application:
+    name: order
+  cloud:
+    config:
+      uri: http://localhost:8888
+      username: root
+      password: s3cr3t
+      fail-fast: true
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    cloud:
+      bus:
+        enabled: true
+        refresh:
+          enabled: true

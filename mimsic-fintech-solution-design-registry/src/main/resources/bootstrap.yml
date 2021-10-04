@@ -1,0 +1,23 @@
+---
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetchRegistry: false
+    registerWithEureka: false
+  server:
+    waitTimeInMsWhenSyncEmpty: 0
+
+server:
+  port: ${PORT:8761}
+
+spring:
+  application:
+    name: registry
+  cloud:
+    config:
+      uri: ${CONFIG_SERVER_URL:http://localhost:8888}
+      username: user
+      password: ${CONFIG_SERVICE_PASSWORD}
+      fail-fast: true
+

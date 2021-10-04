@@ -1,0 +1,6 @@
+FROM openjdk:8
+MAINTAINER arz
+EXPOSE 8888
+ADD /target/fintech-solution-design-configurer.jar application.jar
+ENTRYPOINT ["java", "-Xmx200m", "-jar", "application.jar"]
+HEALTHCHECK --interval=30s --timeout=30s CMD curl -f http://localhost:8888/actuator/health || exit 1

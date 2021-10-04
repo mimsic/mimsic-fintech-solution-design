@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.mimsic.faf</groupId>
-    <artifactId>mimsic-fintech-architecture-foundation</artifactId>
+    <groupId>com.github.mimsic.fsd</groupId>
+    <artifactId>mimsic-fintech-solution-design</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
 
@@ -16,12 +16,60 @@
     </parent>
 
     <modules>
-        <module>mimsic-fintech-architecture-foundation-customer</module>
-        <module>mimsic-fintech-architecture-foundation-order</module>
-        <module>mimsic-fintech-architecture-foundation-notification</module>
-        <module>mimsic-fintech-architecture-foundation-payment</module>
-        <module>mimsic-fintech-architecture-foundation-product</module>
-        <module>mimsic-fintech-architecture-foundation-transaction</module>
+        <module>mimsic-fintech-solution-design-api</module>
+        <module>mimsic-fintech-solution-design-common</module>
+        <module>mimsic-fintech-solution-design-configurer</module>
+        <module>mimsic-fintech-solution-design-customer</module>
+        <module>mimsic-fintech-solution-design-gateway</module>
+        <module>mimsic-fintech-solution-design-notification</module>
+        <module>mimsic-fintech-solution-design-order</module>
+        <module>mimsic-fintech-solution-design-payment</module>
+        <module>mimsic-fintech-solution-design-product</module>
+        <module>mimsic-fintech-solution-design-registry</module>
+        <module>mimsic-fintech-solution-design-transaction</module>
     </modules>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <dependency>
+                <groupId>com.github.mimsic.fsd</groupId>
+                <artifactId>mimsic-fintech-solution-design-api</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.isomorphism</groupId>
+                <artifactId>token-bucket</artifactId>
+                <version>1.7</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>2020.0.4</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

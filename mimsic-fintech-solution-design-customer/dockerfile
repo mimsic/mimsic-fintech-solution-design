@@ -1,0 +1,5 @@
+FROM openjdk:8
+MAINTAINER arz
+EXPOSE 8080
+ADD /target/mimsic-fintech-solution-design-customer.jar application.jar
+ENTRYPOINT ["java", "-jar", "application.jar"]
