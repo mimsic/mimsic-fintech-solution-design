@@ -56,20 +56,104 @@
     </dependencyManagement>
 
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-            </plugin>
-        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <executions>
+                        <!-- Remove existing image from local repo -->
+                        <execution>
+                            <id>docker-clean</id>
+                            <phase>install</phase>
+                            <goals>
+                                <goal>exec</goal>
+                            </goals>
+                            <configuration>
+                                <executable>docker</executable>
+                                <workingDirectory>${project.basedir}</workingDirectory>
+                                <arguments>
+                                    <argument>rmi</argument>
+                                    <argument>${project.artifactId}:${project.version}</argument>
+                                </arguments>
+                                <successCodes>
+                                    <successCode>0</successCode>
+                                    <successCode>1</successCode>
+                                </successCodes>
+                            </configuration>
+                        </execution>
+
+                        <!-- Create new docker image using Dockerfile -->
+                        <execution>
+                            <id>docker-build</id>
+                            <phase>install</phase>
+                            <goals>
+                                <goal>exec</goal>
+                            </goals>
+                            <configuration>
+                                <executable>docker</executable>
+                                <workingDirectory>${project.basedir}</workingDirectory>
+                                <arguments>
+                                    <argument>build</argument>
+                                    <argument>-f</argument>
+                                    <argument>dockerfile</argument>
+                                    <argument>-t</argument>
+                                    <argument>${project.artifactId}:${project.version}</argument>
+                                    <argument>.</argument>
+                                </arguments>
+                                <successCodes>
+                                    <successCode>0</successCode>
+                                </successCodes>
+                            </configuration>
+                        </execution>
+
+                        <!-- Login to a docker repo. -->
+                        <execution>
+                            <id>docker-login</id>
+                            <phase>deploy</phase>
+                            <goals>
+                                <goal>exec</goal>
+                            </goals>
+                            <configuration>
+                                <executable>docker</executable>
+                                <workingDirectory>${project.basedir}</workingDirectory>
+                                <arguments>
+                                    <argument>login</argument>
+                                    <argument>-u</argument>
+                                    <argument>${docker.user}</argument>
+                                    <argument>-p</argument>
+                                    <argument>${docker.password}</argument>
+                                    <argument>${docker.url}</argument>
+                                </arguments>
+                                <successCodes>
+                                    <successCode>0</successCode>
+                                </successCodes>
+                            </configuration>
+                        </execution>
+
+                        <!-- Push the image to a docker repo. -->
+                        <execution>
+                            <id>docker-push</id>
+                            <phase>deploy</phase>
+                            <goals>
+                                <goal>exec</goal>
+                            </goals>
+                            <configuration>
+                                <executable>docker</executable>
+                                <workingDirectory>${project.basedir}</workingDirectory>
+                                <arguments>
+                                    <argument>push</argument>
+                                    <argument>${project.artifactId}:${project.version}</argument>
+                                </arguments>
+                                <successCodes>
+                                    <successCode>0</successCode>
+                                </successCodes>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
 </project>
