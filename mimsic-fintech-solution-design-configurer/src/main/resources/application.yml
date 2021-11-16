@@ -1,24 +1,44 @@
 ---
+eureka:
+  client:
+    enabled: false
+    fetchRegistry: false
+    registerWithEureka: false
+    serviceUrl:
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL:http://localhost:8761/eureka}
+  instance:
+    leaseRenewalIntervalInSeconds: 30
+    metadataMap:
+      instanceId: ${vcap.application.instance_id:${spring.application.name}:${spring.application.instance_id:${server.port}}}
+    preferIpAddress: true
+
 management:
   endpoints:
+    restart:
+      enabled: true
     web:
       exposure:
         include: "*"
+  security:
+    enabled: false
 
 server:
-  port: 8888
+  port: ${SERVER_PORT:8888}
 
 spring:
+  application:
+    name: ${SPRING_APPLICATION_NAME:configurer}
+
   cloud:
     config:
       server:
         native:
-          search-locations: classpath:/shared
+          searchLocations: classpath:/shared
   profiles:
     active: native
 
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:guest}
+    password: ${SPRING_RABBITMQ_PASSWORD:guest}

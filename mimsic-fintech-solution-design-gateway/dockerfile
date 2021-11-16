@@ -1,0 +1,5 @@
+FROM openjdk:8
+MAINTAINER arz
+EXPOSE ${GATEWAY_PORT:-8080}
+ADD /target/mimsic-fintech-solution-design-gateway.jar /app/application.jar
+ENTRYPOINT ["java", "-jar", "/app/application.jar"]

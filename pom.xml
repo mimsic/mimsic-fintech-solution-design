@@ -31,7 +31,6 @@
 
     <dependencyManagement>
         <dependencies>
-
             <dependency>
                 <groupId>com.github.mimsic.fsd</groupId>
                 <artifactId>mimsic-fintech-solution-design-api</artifactId>
@@ -51,7 +50,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-
         </dependencies>
     </dependencyManagement>
 

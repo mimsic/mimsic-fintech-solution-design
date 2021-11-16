@@ -1,23 +1,48 @@
 ---
 eureka:
-  instance:
-    prefer-ip-address: true
   client:
+    enabled: true
     fetchRegistry: false
     registerWithEureka: false
+  instance:
+    preferIpAddress: true
   server:
     waitTimeInMsWhenSyncEmpty: 0
 
+management:
+  endpoints:
+    restart:
+      enabled: true
+    web:
+      exposure:
+        include: "*"
+  security:
+    enabled: false
+
 server:
-  port: ${PORT:8761}
+  port: ${SERVER_PORT:8761}
 
 spring:
   application:
     name: registry
-  cloud:
-    config:
-      uri: ${CONFIG_SERVER_URL:http://localhost:8888}
-      username: user
-      password: ${CONFIG_SERVICE_PASSWORD}
-      fail-fast: true
 
+  cloud:
+    bus:
+      enabled: true
+      refresh:
+        enabled: true
+    config:
+      uri: ${SPRING_CLOUD_CONFIG_URI:http://localhost:8888}
+      username: ${SPRING_CLOUD_CONFIG_USERNAME:user}
+      password: ${SPRING_CLOUD_CONFIG_PASSWORD:password}
+      failFast: true
+      retry:
+        maxAttempts: 20
+        maxInterval: 15000
+        initialInterval: 10000
+
+  rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:guest}
+    password: ${SPRING_RABBITMQ_PASSWORD:guest}

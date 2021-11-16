@@ -1,0 +1,188 @@
+version: "3.9"
+
+services:
+
+  ignite:
+    image: apacheignite/ignite:2.10.0
+    restart: on-failure
+    networks:
+      - network
+    ports:
+      - ${IGNITE_CLIENT_CONNECTION_HOST_PORT:-0}:${IGNITE_CLIENT_CONNECTION_PORT}
+      - ${IGNITE_COMMUNICATION_HOST_PORT:-0}:${IGNITE_COMMUNICATION_PORT}
+      - ${IGNITE_DISCOVERY_HOST_PORT:-0}:${IGNITE_DISCOVERY_PORT}
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: on-failure
+    networks:
+      - network
+    ports:
+      - ${PGADMIN_HOST_PORT:-0}:${PGADMIN_PORT}
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@domain.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    volumes:
+      - type: volume
+        source: pgadmin
+        target: /var/lib/pgadmin
+        volume:
+          nocopy: false
+
+  postgres:
+    image: postgres:13
+    restart: on-failure
+    networks:
+      - network
+    ports:
+      - ${POSTGRES_HOST_PORT:-0}:${POSTGRES_PORT}
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - type: volume
+        source: postgres
+        target: /var/lib/postgresql/data
+        volume:
+          nocopy: false
+
+  rabbitmq:
+    hostname: rabbit-node
+    image: rabbitmq:3-management
+    restart: on-failure
+    networks:
+      - network
+    ports:
+      - ${RABBITMQ_HOST_PORT:-0}:${RABBITMQ_PORT}
+      - ${RABBITMQ_MMANAGEMENT_HOST_PORT:-0}:${RABBITMQ_MMANAGEMENT_PORT}
+    volumes:
+      - type: volume
+        source: rabbitmq
+        target: /var/lib/rabbitmq
+        volume:
+          nocopy: false
+
+  configurer:
+    build:
+      context: ./mimsic-fintech-solution-design-configurer
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    networks:
+      - network
+    ports:
+      - ${CONFIGURER_HOST_PORT:-0}:${CONFIGURER_PORT}
+    environment:
+      EUREKA_CLIENT_SERVICE_URL: http://registry:${REGISTRY_PORT}/eureka
+      SERVER_PORT: ${CONFIGURER_PORT}
+      SPRING_APPLICATION_NAME: ${CONFIGURER_NAME}
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: ${RABBITMQ_PORT}
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+
+  customer:
+    build:
+      context: ./mimsic-fintech-solution-design-customer
+    restart: on-failure
+    depends_on:
+      - configurer
+      - postgres
+      - rabbitmq
+      - registry
+    networks:
+      - network
+    ports:
+      - ${CUSTOMER_HOST_PORT:-0}:${CUSTOMER_PORT}
+    environment:
+      EUREKA_CLIENT_SERVICE_URL: http://registry:${REGISTRY_PORT}/eureka
+      SERVER_PORT: ${CUSTOMER_PORT}
+      SPRING_CLOUD_CONFIG_DISCOVERY_SERVICE_ID: ${CONFIGURER_NAME}
+      SPRING_CLOUD_CONFIG_URI: http://configurer:${CONFIGURER_PORT}
+      SPRING_CLOUD_CONFIG_USERNAME: ${CONFIGURER_USERNAME}
+      SPRING_CLOUD_CONFIG_PASSWORD: ${CONFIGURER_PASSWORD}
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: ${RABBITMQ_PORT}
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+
+  gateway:
+    build:
+      context: ./mimsic-fintech-solution-design-gateway
+    restart: on-failure
+    depends_on:
+      - configurer
+      - rabbitmq
+      - registry
+    networks:
+      - network
+    ports:
+      - ${GATEWAY_HOST_PORT:-0}:${GATEWAY_PORT}
+    environment:
+      EUREKA_CLIENT_SERVICE_URL: http://registry:${REGISTRY_PORT}/eureka
+      SERVER_PORT: ${GATEWAY_PORT}
+      SPRING_CLOUD_CONFIG_DISCOVERY_SERVICE_ID: ${CONFIGURER_NAME}
+      SPRING_CLOUD_CONFIG_URI: http://configurer:${CONFIGURER_PORT}
+      SPRING_CLOUD_CONFIG_USERNAME: ${CONFIGURER_USERNAME}
+      SPRING_CLOUD_CONFIG_PASSWORD: ${CONFIGURER_PASSWORD}
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: ${RABBITMQ_PORT}
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+
+  order:
+    build:
+      context: ./mimsic-fintech-solution-design-order
+    restart: on-failure
+    depends_on:
+      - configurer
+      - postgres
+      - rabbitmq
+      - registry
+    networks:
+      - network
+    ports:
+      - ${ORDER_HOST_PORT:-0}:${ORDER_PORT}
+    environment:
+      EUREKA_CLIENT_SERVICE_URL: http://registry:${REGISTRY_PORT}/eureka
+      SERVER_PORT: ${ORDER_PORT}
+      SPRING_CLOUD_CONFIG_DISCOVERY_SERVICE_ID: ${CONFIGURER_NAME}
+      SPRING_CLOUD_CONFIG_URI: http://configurer:${CONFIGURER_PORT}
+      SPRING_CLOUD_CONFIG_USERNAME: ${CONFIGURER_USERNAME}
+      SPRING_CLOUD_CONFIG_PASSWORD: ${CONFIGURER_PASSWORD}
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: ${RABBITMQ_PORT}
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+
+  registry:
+    build:
+      context: ./mimsic-fintech-solution-design-registry
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    networks:
+      - network
+    ports:
+      - ${REGISTRY_HOST_PORT:-0}:${REGISTRY_PORT}
+    environment:
+      SERVER_PORT: ${REGISTRY_PORT}
+      SPRING_CLOUD_CONFIG_URI: http://configurer:${CONFIGURER_PORT}
+      SPRING_CLOUD_CONFIG_USERNAME: ${CONFIGURER_USERNAME}
+      SPRING_CLOUD_CONFIG_PASSWORD: ${CONFIGURER_PASSWORD}
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: ${RABBITMQ_PORT}
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+
+networks:
+  network:
+    driver: bridge
+
+volumes:
+  pgadmin:
+    driver: local
+  postgres:
+    driver: local
+  rabbitmq:
+    driver: local

@@ -1,0 +1,5 @@
+FROM openjdk:8
+MAINTAINER arz
+EXPOSE ${REGISTRY_PORT:-8761}
+ADD /target/mimsic-fintech-solution-design-registry.jar /app/application.jar
+ENTRYPOINT ["java", "-jar", "/app/application.jar"]

@@ -13,7 +13,6 @@
     <version>1.0-SNAPSHOT</version>
 
     <dependencies>
-
         <dependency>
             <groupId>com.github.mimsic.base</groupId>
             <artifactId>mimsic-base-common</artifactId>
@@ -23,7 +22,6 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
-
     </dependencies>
 
 </project>

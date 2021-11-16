@@ -1,18 +1,54 @@
 ---
-spring:
-  application:
-    name: gateway
-  cloud:
-    config:
-      uri: http://localhost:8888
-      username: root
-      password: s3cr3t
-      fail-fast: true
+eureka:
+  client:
+    enabled: true
+    fetchRegistry: true
+    registerWithEureka: false #might need to be true
+    serviceUrl:
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL:http://localhost:8761/eureka}
+  instance:
+    leaseRenewalIntervalInSeconds: 30
+    metadataMap:
+      instanceId: ${vcap.application.instance_id:${spring.application.name}:${spring.application.instance_id:${server.port}}}
+    preferIpAddress: true
 
 management:
   endpoints:
+    restart:
+      enabled: true
     web:
       exposure:
         include: "*"
   security:
     enabled: false
+
+server:
+  port: ${SERVER_PORT:0}
+
+spring:
+  application:
+    name: gateway
+
+  cloud:
+    bus:
+      enabled: true
+      refresh:
+        enabled: true
+    config:
+      discovery:
+        enabled: false
+        serviceId: ${SPRING_CLOUD_CONFIG_DISCOVERY_SERVICE_ID:configurer}
+      uri: ${SPRING_CLOUD_CONFIG_URI:http://localhost:8888}
+      username: ${SPRING_CLOUD_CONFIG_USERNAME:user}
+      password: ${SPRING_CLOUD_CONFIG_PASSWORD:password}
+      failFast: true
+      retry:
+        maxAttempts: 20
+        maxInterval: 15000
+        initialInterval: 10000
+
+  rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:guest}
+    password: ${SPRING_RABBITMQ_PASSWORD:guest}
