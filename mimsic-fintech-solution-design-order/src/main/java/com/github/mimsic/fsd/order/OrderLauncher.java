@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationContext;
         "com.github.mimsic.fsd.api.feign.customer"
 })
 @SpringBootApplication(scanBasePackages = {
+        "com.github.mimsic.base.persistence",
         "com.github.mimsic.fsd.order"
 })
 public class OrderLauncher {

@@ -1,1 +1,30 @@
 ---
+persistence-config:
+  persistence-properties:
+    "[org.hibernate.envers.audit_table_suffix]": _log
+    "[org.hibernate.envers.revision_field_name]": rev
+    "[org.hibernate.envers.revision_type_field_name]": rev_type
+    "[org.hibernate.envers.store_data_at_delete]": true
+    "[hibernate.dialect]": org.hibernate.dialect.PostgreSQL95Dialect
+    "[hibernate.hbm2ddl.auto]": update
+    "[hibernate.jdbc.lob.non_contextual_creation]": true
+    "[hibernate.jdbc.time_zone]": UTC
+  target-data-sources:
+    default:
+      url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/order}
+      driver-class-name: org.postgresql.Driver
+      username: ${POSTGRES_USERNAME:username}
+      password: ${POSTGRES_PASSWORD:password}
+      schema: public
+    tenant-1:
+      url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/order}
+      driver-class-name: org.postgresql.Driver
+      username: ${POSTGRES_USERNAME:username}
+      password: ${POSTGRES_PASSWORD:password}
+      schema: tenant_1
+    tenant-2:
+      url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/order}
+      driver-class-name: org.postgresql.Driver
+      username: ${POSTGRES_USERNAME:username}
+      password: ${POSTGRES_PASSWORD:password}
+      schema: tenant_2
