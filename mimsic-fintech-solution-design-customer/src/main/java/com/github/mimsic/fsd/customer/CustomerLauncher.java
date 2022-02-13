@@ -11,6 +11,8 @@ import org.springframework.context.ApplicationContext;
 //        "com.github.mimsic.fsd.common.feign"
 })
 @SpringBootApplication(scanBasePackages = {
+        "com.github.mimsic.base.ignite",
+        "com.github.mimsic.base.persistence",
         "com.github.mimsic.fsd.customer"
 })
 public class CustomerLauncher {

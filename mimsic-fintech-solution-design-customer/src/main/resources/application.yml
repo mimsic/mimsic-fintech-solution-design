@@ -1,1 +1,62 @@
 ---
+spring:
+  profiles:
+    active:
+      - ignite
+
+---
+spring:
+  profiles:
+    - ignite
+
+ignite-config:
+  client-mode: true
+  grid-logger: true
+  network-mode: multicast
+  network:
+    aws-s3:
+      bucket-name: bucket-name
+      access-key: aws
+      secret-key: awsSecret
+    multicast:
+      communication:
+        local-port: 47100
+        local-port-range: 20
+      discovery:
+        addresses:
+          - ip: "127.0.0.1"
+            ports: "47500..47520"
+        local-port: 47500
+        local-port-range: 20
+        share-mode: false
+
+---
+persistence-config:
+  persistence-properties:
+    "[org.hibernate.envers.audit_table_suffix]": _log
+    "[org.hibernate.envers.revision_field_name]": rev
+    "[org.hibernate.envers.revision_type_field_name]": rev_type
+    "[org.hibernate.envers.store_data_at_delete]": true
+    "[hibernate.dialect]": org.hibernate.dialect.PostgreSQL95Dialect
+    "[hibernate.hbm2ddl.auto]": update
+    "[hibernate.jdbc.lob.non_contextual_creation]": true
+    "[hibernate.jdbc.time_zone]": UTC
+  target-data-sources:
+    default:
+      url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/customer}
+      driver-class-name: org.postgresql.Driver
+      username: ${POSTGRES_USERNAME:username}
+      password: ${POSTGRES_PASSWORD:password}
+      schema: public
+    tenant-1:
+      url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/customer}
+      driver-class-name: org.postgresql.Driver
+      username: ${POSTGRES_USERNAME:username}
+      password: ${POSTGRES_PASSWORD:password}
+      schema: tenant_1
+    tenant-2:
+      url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/customer}
+      driver-class-name: org.postgresql.Driver
+      username: ${POSTGRES_USERNAME:username}
+      password: ${POSTGRES_PASSWORD:password}
+      schema: tenant_2
