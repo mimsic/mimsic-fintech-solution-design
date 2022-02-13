@@ -37,7 +37,7 @@ services:
     ports:
       - ${POSTGRES_HOST_PORT:-0}:${POSTGRES_PORT}
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_USERNAME: ${POSTGRES_USERNAME}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - type: volume
@@ -84,7 +84,7 @@ services:
   customer:
     build:
       context: ./mimsic-fintech-solution-design-customer
-    restart: on-failure
+#    restart: on-failure
     depends_on:
       - configurer
       - postgres
@@ -96,6 +96,9 @@ services:
       - ${CUSTOMER_HOST_PORT:-0}:${CUSTOMER_PORT}
     environment:
       EUREKA_CLIENT_SERVICE_URL: http://registry:${REGISTRY_PORT}/eureka
+      POSTGRES_URL: jdbc:postgresql://postgres:${POSTGRES_PORT}/customer
+      POSTGRES_USERNAME: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       SERVER_PORT: ${CUSTOMER_PORT}
       SPRING_CLOUD_CONFIG_DISCOVERY_SERVICE_ID: ${CONFIGURER_NAME}
       SPRING_CLOUD_CONFIG_URI: http://configurer:${CONFIGURER_PORT}
@@ -133,7 +136,7 @@ services:
   order:
     build:
       context: ./mimsic-fintech-solution-design-order
-    restart: on-failure
+#    restart: on-failure
     depends_on:
       - configurer
       - postgres
@@ -145,6 +148,9 @@ services:
       - ${ORDER_HOST_PORT:-0}:${ORDER_PORT}
     environment:
       EUREKA_CLIENT_SERVICE_URL: http://registry:${REGISTRY_PORT}/eureka
+      POSTGRES_URL: jdbc:postgresql://postgres:${POSTGRES_PORT}/order
+      POSTGRES_USERNAME: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       SERVER_PORT: ${ORDER_PORT}
       SPRING_CLOUD_CONFIG_DISCOVERY_SERVICE_ID: ${CONFIGURER_NAME}
       SPRING_CLOUD_CONFIG_URI: http://configurer:${CONFIGURER_PORT}
